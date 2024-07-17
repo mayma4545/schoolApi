@@ -1,7 +1,11 @@
-const {Sequelize, DataTypes} = require('sequelize')
+const {Sequelize, DataTypes, Model} = require('sequelize')
 const db  = require('./db')
 
-const des = db.define("des",{
+const desDB = db.define("des",{
+    desId:{
+        type:DataTypes.STRING,
+        allowNull:false
+    },
     building:{
         type:DataTypes.STRING,
         allowNull:false
@@ -34,7 +38,7 @@ const des = db.define("des",{
         type:DataTypes.STRING,
         allowNull:false
     },
-    teacherLirst:{
+    teacherLast:{
         type:DataTypes.STRING,
         allowNull:false
     },
@@ -55,3 +59,6 @@ const des = db.define("des",{
         allowNull:true
     },
 })
+
+desDB.sync({force:false}, ()=> console.log("desDB is Ready!"))
+module.exports = desDB
