@@ -1,9 +1,9 @@
 const {Sequelize, DataTypes, Model} = require('sequelize')
 const db  = require('./db')
 
-const adminDesDB = db.define("adminDes",{
+const roseroDesDB = db.define("roseroDes",{
     desId:{
-        type: DataTypes.TEXT,
+        type:DataTypes.STRING,
         allowNull:false
     },
     building:{
@@ -60,5 +60,5 @@ const adminDesDB = db.define("adminDes",{
     },
 })
 
-adminDesDB.sync({force:false}, ()=> console.log("adminDesDB is Ready!"))
-module.exports = adminDesDB
+roseroDesDB.sync({force:false}, ()=> console.log("desDB is Ready!"))
+module.exports = roseroDesDB

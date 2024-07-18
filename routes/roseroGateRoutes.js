@@ -1,25 +1,26 @@
 const express = require("express")
-const desDB = require("../model/des")
+const adminDesDB = require("../model/roseroDesDB")
 const { where } = require("sequelize")
-const mainGateRouter = express.Router()
+const roseroDesDB = require("../model/roseroDesDB")
+const adminGateRoute = express.Router()
 
 
-mainGateRouter.route("/main")
+adminGateRoute.route("/rosero")
     .get(async(req,res)=>{
         try {
-            const datas = await desDB.findAll()
+            const datas = await roseroDesDB.findAll()
             res.json(datas)
         } catch (error) {
           console.log(`Error on ${req.baseUrl} - ${error}`)  
         }
     })
-mainGateRouter.route("/main/:id")
+adminGateRoute.route("/rosero/:id")
     .get(async(req,res)=>{
         try {
-            const datas = await desDB.findAll({where:{desId:req.params.id}})
+            const datas = await roseroDesDB.findAll({where:{desId:req.params.id}})
             res.json(datas)
         } catch (error) {
           console.log(`Error on ${req.baseUrl} - ${error}`)  
         }
     })
-module.exports = mainGateRouter
+module.exports = adminGateRoute

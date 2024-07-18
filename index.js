@@ -2,26 +2,51 @@ const express = require('express')
 const desDB = require('./model/des')
 const { data } = require('./data')
 const mainDB = require('./model/mainDB')
+const adminData = require("./adminData")
+const adminDesDB = require("./model/adminDesDB")
+const adminImageDes = require("./model/adminImageDB")
+const {adminImage} = require("./adminImages")
 const { mainImage } = require('./images')
+const roserData = require("./roseroData")
+const roseroDesDB = require("./model/roseroDesDB")
+const roseroImageDB = require("./model/roseroImageDB")
+const roseroImage = require("./pages/roseroImages")
 const cors = require("cors")
+const numCPUs = require('os').cpus().length;
 const app = express()
 const PORT = 6000
+const cluster = require('cluster')
+
+if (cluster.isMaster) {
+    console.log(`Master ${process.pid} is running`);
+  
+    // Fork workers.
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died`);
+  });
+}else{
 
 
 app.use((req,res,next)=>{
-    console.log(`reques from ${req.ip}`)
+    const now = new Date()
+    
+    console.log(`Worder: ${process.pid}[${req.method}] Request to [ ${req.url} ] from ${req.ip} on ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}\n`)
     next()
 })
-app.use(cors())
+app.use(cors({origin:'*'}))
 
 app.get('/' , (req , res)=>{
    res.send('hello from simple server :)')
 })
 
 app.get('/data', (req,res)=>{
-    data.forEach(async data =>{
+    roserData.forEach(async data =>{
         try {
-            await desDB.create({desId: data.id ,building:data.building, buildingType:"Room",room:data.room,description:data.description,
+            await roseroDesDB.create({desId: data.id ,building:data.building, buildingType:"Room",room:data.room,description:data.description,
                 section:data.section,gate:data.gate, gradeLevel:data.grade_level, teacherFirst:data.teacher, teacherLast:data.last, teacherMiddle:'uwu', assistantTeacherFirst:data.teacher_assist, assistantTeacherLast:data.last2, assistantTeacherMiddle:'uwu'
  
             })
@@ -35,17 +60,21 @@ app.get('/data', (req,res)=>{
 })
 app.get('/images' ,(req , res)=>{
     try {
-        mainImage.forEach(async(data)=>{
-            await mainDB.create({desId:data.id, path:data.path})
+        roseroImage.forEach(async(data)=>{
+            await roseroImageDB.create({desId:data.id, path:data.path})
         })
        res.send("done!")
       
     } catch (error) {
-        console.log(error)
+        console.log(`erro on images ${error}`)
     }
   
 })
 
 app.use("/gate", require("./routes/mainGateRouter"))
+app.use("/gate", require("./routes/adminGateRoute"))
+app.use("/gate", require("./routes/roseroGateRoutes"))
 app.use("/images", require("./routes/imagesRouter"))
 app.listen(PORT, ()=> console.log(`Server running at port ${PORT}`))
+
+}

@@ -163,4 +163,4 @@ const roseroData = [
 
 
 
-export default roseroData
+module.exports = roseroData

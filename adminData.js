@@ -159,4 +159,4 @@ const adminData = [
 ]
 
 
-export default adminData
+module.exports = adminData
