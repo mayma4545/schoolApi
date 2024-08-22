@@ -14,7 +14,7 @@ const roseroImage = require("./pages/roseroImages")
 const cors = require("cors")
 const numCPUs = require('os').cpus().length;
 const app = express()
-const PORT = 6000
+const PORT = 3000
 const cluster = require('cluster')
 
 if (cluster.isMaster) {
@@ -29,6 +29,8 @@ if (cluster.isMaster) {
     console.log(`Worker ${worker.process.pid} died`);
   });
 }else{
+
+app.use(express.json());
 
 
 app.use((req,res,next)=>{
@@ -75,6 +77,7 @@ app.use("/gate", require("./routes/mainGateRouter"))
 app.use("/gate", require("./routes/adminGateRoute"))
 app.use("/gate", require("./routes/roseroGateRoutes"))
 app.use("/images", require("./routes/imagesRouter"))
+app.use("/admin", require("./routes/adminRoute"))
 app.listen(PORT, ()=> console.log(`Server running at port ${PORT}`))
 
 }
