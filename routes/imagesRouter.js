@@ -11,17 +11,12 @@ const {Op} = require("sequelize");
 const adminDesDB = require('../model/adminDesDB');
 const roseroDesDB = require('../model/roseroDesDB');
 const desDB = require('../model/des');
+const stream = require("stream")
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Append the original file extension
-  }
+const upload = multer({
+  storage: multer.memoryStorage(), // Store the file in memory instead of disk
 });
 
-const upload = multer({ storage: storage });
 
 imagesRouter.route('/get')
   .get(async (req, res) => {
@@ -40,7 +35,7 @@ imagesRouter.route('/get')
       //  console.log(data)
         res.end(data);
       });
-      console.log("gumana")
+
     } catch (error) {
       console.log(`${req.baseUrl}: ${error}`);
       res.status(500).json({ error: 'Internal server error' });
@@ -145,5 +140,97 @@ imagesRouter.route('/list/:gate/:buildCode/:description')
       res.status(500).json({ error: `Internal server error - ${error}` });
     }
   });
+
+//   const { google } = require('googleapis');
+
+// // Path to your service account key file
+// const KEYFILEPATH = "./concise-reserve-396907-1f8e81885058.json"
+
+// // Scopes required for Google Drive
+// const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
+
+// const auth = new google.auth.GoogleAuth({
+//   keyFile: KEYFILEPATH,
+//   scopes: SCOPES,
+// });
+
+// const drive = google.drive({ version: 'v3', auth });
+
+// async function uploadFileToDrive(fileBuffer, fileName) {
+//   try {
+//     const fileMetadata = {
+//       name: fileName,
+//     };
+//     const media = {
+//       mimeType: 'image/jpeg', // Adjust this based on file type
+//       body: stream.Readable.from(fileBuffer), // Stream the file from memory
+//     };
+    
+//     const response = await drive.files.create({
+//       resource: fileMetadata,
+//       media: media,
+//       fields: 'id',
+//     });
+
+//     return response.data.id;
+//   } catch (error) {
+//     throw new Error(`Error uploading file to Google Drive: ${error}`);
+//   }
+// }
+
+// // Example usage
+// imagesRouter.route("/testing")
+//   .post(upload.single("photo"),async(req,res)=>{
+//     const fileBuffer = req.file.buffer; // Get the file buffer from multer
+//     const fileName = req.file.originalname;
+
+//     // Upload the file buffer directly to Google Drive
+//     const fileId = await uploadFileToDrive(fileBuffer, fileName);
+//     console.log(fileId)
+//     console.log("adding image")
+//     res.send({ success: true, fileId });
+//   })
+//   .get(async(req,res)=>{
+//     const fileId = "1vjMTnmVAxr4eq0LQDKS1alJnEsFbsPHr"; // File ID from the request
+//     try {
+//       // Step 1: Fetch file metadata (to confirm the file exists and check its MIME type)
+//       const fileMetadata = await drive.files.get({
+//         fileId: fileId,
+//         fields: 'id, name, mimeType',
+//       });
+  
+//       // Check if the file is an image (you can extend this for other types)
+//       const mimeType = fileMetadata.data.mimeType;
+//       if (!mimeType.startsWith('image/')) {
+//         return res.status(400).send('The requested file is not an image.');
+//       }
+  
+//       // Step 2: Fetch the file content as a stream
+//       const response = await drive.files.get(
+//         {
+//           fileId: fileId,
+//           alt: 'media',
+//         },
+//         { responseType: 'stream' }
+//       );
+  
+//       // Set the correct content type (e.g., image/jpeg)
+//       res.setHeader('Content-Type', mimeType);
+  
+//       // Step 3: Pipe the stream to the client
+//       response.data
+//         .on('end', () => {
+//           console.log('Image successfully sent to the client.');
+//         })
+//         .on('error', (error) => {
+//           console.error('Error while sending the image:', error);
+//           res.status(500).send('Error retrieving the image from Google Drive.');
+//         })
+//         .pipe(res); // Pipe the image data stream to the response
+//     } catch (error) {
+//       console.error('Error retrieving image from Google Drive:', error);
+//       res.status(500).send('Error retrieving image from Google Drive.');
+//     }
+//   })
 
 module.exports = imagesRouter;
