@@ -58,6 +58,9 @@ const adminDesDB = db.define("adminDes",{
         type:DataTypes.STRING,
         allowNull:true
     },
+    facilities:{
+        type:DataTypes.STRING
+    }
 })
 
 adminDesDB.sync({force:false}, ()=> console.log("adminDesDB is Ready!"))

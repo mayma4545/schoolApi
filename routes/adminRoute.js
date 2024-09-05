@@ -9,7 +9,13 @@ const path = require("path")
 const mainImage = require("../model/mainDB")
 const adminImage = require("../model/adminImageDB")
 const roseroImage = require("../model/roseroImageDB")
+const updateDesController = require("./../controllers/updateDesController")
+const crypto = require('crypto');
 
+
+function generateHash(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
+}
 
 const multer = require("multer")
 const adminImageDB = require('../model/adminImageDB')
@@ -25,12 +31,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const addDes =async (g, req, dbs, gts)=>{
+const addDes =async (g, req, dbs, gts, code)=>{
     let latestRecord;
         
     try {
         const [results, metadata] = await db.query(
-            `SELECT desId FROM ${gts}  WHERE gate = :gate ORDER BY createdAt DESC, id DESC LIMIT 1`,
+            `SELECT * FROM ${gts} ORDER BY id DESC LIMIT 1;`,
             {
               replacements: { gate: g},
               type: Sequelize.QueryTypes.SELECT,
@@ -58,16 +64,17 @@ const addDes =async (g, req, dbs, gts)=>{
             desId: latestRecord,
             gate:g,
             building:`Building ${building}`,
-            section: section,
-            room:`Room ${room}`,
-            gradeLevel: gradeLevel,
-            teacherFirst:teacherFirstname || 'N/A',
-            teacherMiddle:teacherMiddlename || 'N/A',
-            teacherLast:teacherLastname|| 'N/A',
-            assistantTeacherFirst:assistantTeacherFirstname|| 'N/A',
-            asssitantTeacherMiddle:assistantTeacherMiddlename|| 'N/A',
-            assistantTeacherLast:assistantTeacherLastname|| 'N/A',
-            description:description
+            section: section || 'null',
+            room:room == "null" ? "null" : `Room ${room}`,
+            gradeLevel: gradeLevel || 'null',
+            teacherFirst:teacherFirstname  || 'null',
+            teacherMiddle:teacherMiddlename || 'null',
+            teacherLast:teacherLastname || 'null',
+            assistantTeacherFirst:assistantTeacherFirstname || 'null',
+            assistantTeacherMiddle:assistantTeacherMiddlename || 'null',
+            assistantTeacherLast:assistantTeacherLastname || 'null',
+            description:description,
+             buildingType: code
         }
         const result = await dbs.create({...json})
         console.log(`${g} success`)
@@ -79,9 +86,10 @@ const addDes =async (g, req, dbs, gts)=>{
 }
 adminRoute.route("/add/destination")
     .post(async(req,res)=>{
-        const admin = await addDes("admin", req, adminDesDB, "admindes")
-        const main =await addDes("main", req, desDB, "des")
-        const rosero =await addDes("rosero", req, roseroDesDB, "roserodes")
+      const uniqueCode = generateHash(req.body.description + Date.now());
+        const admin = await addDes("admin", req, adminDesDB, "adminDes", uniqueCode)
+        const main =await addDes("main", req, desDB, "des", uniqueCode)
+        const rosero =await addDes("rosero", req, roseroDesDB, "roserodes", uniqueCode)
         console.log(`${admin}  ${rosero} ${main}`)
         res.status(200).json({'main': main, 'admin':admin, 'rosero':rosero})
     })
@@ -137,5 +145,6 @@ adminRoute.route("/delete/destination")
             res.json({error})
           }
         })
-
+adminRoute.route("/update")
+        .post(updateDesController)
 module.exports = adminRoute

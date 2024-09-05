@@ -1,7 +1,7 @@
 const {Sequelize, DataTypes, Model} = require('sequelize')
 const db  = require('./db')
 
-const roseroDesDB = db.define("roseroDes",{
+const roseroDesDB = db.define("roserodes",{
     desId:{
         type:DataTypes.STRING,
         allowNull:false
@@ -58,6 +58,9 @@ const roseroDesDB = db.define("roseroDes",{
         type:DataTypes.STRING,
         allowNull:true
     },
+    facilities:{
+        type:DataTypes.STRING
+    }
 })
 
 roseroDesDB.sync({force:false}, ()=> console.log("desDB is Ready!"))

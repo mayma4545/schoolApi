@@ -58,6 +58,9 @@ const desDB = db.define("des",{
         type:DataTypes.STRING,
         allowNull:true
     },
+    facilities:{
+        type:DataTypes.STRING
+    }
 })
 
 desDB.sync({force:false}, ()=> console.log("desDB is Ready!"))

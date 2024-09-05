@@ -16,6 +16,8 @@ const numCPUs = require('os').cpus().length;
 const app = express()
 const PORT = 3000
 const cluster = require('cluster')
+const adminImageDB = require('./model/adminImageDB')
+const roseroData = require('./roseroData')
 
 if (cluster.isMaster) {
     console.log(`Master ${process.pid} is running`);
@@ -45,22 +47,23 @@ app.get('/' , (req , res)=>{
    res.send('hello from simple server :)')
 })
 
-app.get('/data', (req,res)=>{
-    roserData.forEach(async data =>{
+app.get('/dadada', (req,res)=>{
+    roseroData.forEach(async data =>{
         try {
             await roseroDesDB.create({desId: data.id ,building:data.building, buildingType:"Room",room:data.room,description:data.description,
-                section:data.section,gate:data.gate, gradeLevel:data.grade_level, teacherFirst:data.teacher, teacherLast:data.last, teacherMiddle:'uwu', assistantTeacherFirst:data.teacher_assist, assistantTeacherLast:data.last2, assistantTeacherMiddle:'uwu'
+                section:data.section,gate:data.gate, gradeLevel:data.grade_level, teacherFirst:data.teacher, teacherLast:data.last, teacherMiddle:'uwu', assistantTeacherFirst:data.teacher_assist, assistantTeacherLast:data.last2, assistantTeacherMiddle:'uwu', facilities:data.facilities
  
             })
-             res.json({'message':'data has been saved!'})
+           
         } catch (error) {
             console.log(error)
         }
         
     })
+    res.json({'message':'data has been saved!'})
    
 })
-app.get('/images' ,(req , res)=>{
+app.get('/imagess' ,(req , res)=>{
     try {
         roseroImage.forEach(async(data)=>{
             await roseroImageDB.create({desId:data.id, path:data.path})
@@ -78,6 +81,9 @@ app.use("/gate", require("./routes/adminGateRoute"))
 app.use("/gate", require("./routes/roseroGateRoutes"))
 app.use("/images", require("./routes/imagesRouter"))
 app.use("/admin", require("./routes/adminRoute"))
+app.use("/map", require("./routes/mapRoute"))
+app.use("/user", require("./routes/userAdminRoute"))
+app.use("/action", require("./routes/actionRoute"))
 app.listen(PORT, ()=> console.log(`Server running at port ${PORT}`))
 
 }
