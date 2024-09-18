@@ -76,6 +76,7 @@ app.get('/imagess' ,(req , res)=>{
   
 })
 
+
 app.use("/gate", require("./routes/mainGateRouter"))
 app.use("/gate", require("./routes/adminGateRoute"))
 app.use("/gate", require("./routes/roseroGateRoutes"))

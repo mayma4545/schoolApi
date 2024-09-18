@@ -5,6 +5,13 @@ const mapImageDb = require("./../model/mapImagesDb")
 const path = require("path")
 const fs = require("fs")
 
+const ensureDirectoryExists = (dirPath) => {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+};
+
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, 'uploads/');
