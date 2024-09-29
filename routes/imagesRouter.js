@@ -13,10 +13,20 @@ const roseroDesDB = require('../model/roseroDesDB');
 const desDB = require('../model/des');
 const stream = require("stream")
 
-const upload = multer({
-  storage: multer.memoryStorage(), // Store the file in memory instead of disk
+// const upload = multer({
+//   storage: multer.memoryStorage(), // Store the file in memory instead of disk
+// });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Append the original file extension
+  }
 });
 
+const upload = multer({ storage: storage });
 
 imagesRouter.route('/get')
   .get(async (req, res) => {

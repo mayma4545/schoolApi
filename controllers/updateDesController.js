@@ -47,12 +47,14 @@ async function updateDes(req,res){
         }
      if(isAllGate){
         if(buildingType !== 'Room'){
+            
             const ros = await roseroDesDB.findOne({where:{[Op.or] :[{buildingType:buildingType}, {description:prevDes}]}})
             const ad = await adminDesDB.findOne({where:{[Op.or] :[{buildingType:buildingType}, {description:prevDes}]}})
             const ma = await desDB.findOne({where:{[Op.or] :[{buildingType:buildingType}, {description:prevDes}]}})
-            await desDB.update({...json}, {where:{desId: ma.dataValues.desId}})
-            await adminDesDB.update({...json}, {where:{desId: ad.dataValues.desId}})
-            await roseroDesDB.update({...json}, {where:{desId: ros.dataValues.desId}})
+            console.log(ma.desValues)
+            if(ma?.desValues)await desDB.update({...json}, {where:{desId: ma.dataValues.desId}})
+            if(ad?.desValues)await adminDesDB.update({...json}, {where:{desId: ad.dataValues.desId}})
+            if(ros?.dataValues)await roseroDesDB.update({...json}, {where:{desId: ros.dataValues.desId}})
             console.log("have code")
             console.log("Update For all")
             res.json({success:true})

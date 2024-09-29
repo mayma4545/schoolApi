@@ -18,6 +18,8 @@ const PORT = 3000
 const cluster = require('cluster')
 const adminImageDB = require('./model/adminImageDB')
 const roseroData = require('./roseroData')
+const mapImageDb = require('./model/mapImagesDb')
+const { Op } = require('sequelize')
 
 if (cluster.isMaster) {
     console.log(`Master ${process.pid} is running`);
@@ -48,7 +50,7 @@ app.get('/' , (req , res)=>{
 })
 
 app.get('/dadada', (req,res)=>{
-    roseroData.forEach(async data =>{
+    roserData.forEach(async data =>{
         try {
             await roseroDesDB.create({desId: data.id ,building:data.building, buildingType:"Room",room:data.room,description:data.description,
                 section:data.section,gate:data.gate, gradeLevel:data.grade_level, teacherFirst:data.teacher, teacherLast:data.last, teacherMiddle:'uwu', assistantTeacherFirst:data.teacher_assist, assistantTeacherLast:data.last2, assistantTeacherMiddle:'uwu', facilities:data.facilities
@@ -76,6 +78,18 @@ app.get('/imagess' ,(req , res)=>{
   
 })
 
+app.get("/mapa", async(req,res)=>{
+    const data =await adminDesDB.findAll({where:{building: 'building 67'}})
+    data.forEach(async(a)=>{
+       await mapImageDb.create({desId: a.dataValues.desId, path: 'assets/adminMap/Building 67.jpg', gate:'admin'})
+        // await mapImageDb.destroy({where:{[Op.and]:[
+        //     {desId:a.dataValues.desId},
+        //     {gate:'admin'}
+        // ]}})
+       console.log(`Added map success --> ${a.dataValues.desId} --- ${a.description}`)
+    })
+    res.json({success:true})
+})
 
 app.use("/gate", require("./routes/mainGateRouter"))
 app.use("/gate", require("./routes/adminGateRoute"))
